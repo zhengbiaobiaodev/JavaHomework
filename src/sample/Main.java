@@ -4,15 +4,20 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -44,10 +49,11 @@ public class Main extends Application {
 
     int A = 0;  //第一个柱子，以数字0表示为了方便计算
     int B = 1;  //第二个柱子，以数字0表示为了方便计算
-    int C = 2;  //第三// 个柱子，以数字0表示为了方便计算
+    int C = 2;  //第三个柱子，以数字0表示为了方便计算
 
     List<Color> colors = new ArrayList<>();      //缓存颜色值，红橙黄绿蓝紫緑  七种
     List<Rectangle> rects = new ArrayList<>();   //缓存应该画出的圆盘，最多七个
+    List<Button> stackNode = new ArrayList<>();  //缓存堆栈View中的每个节点
 
     @FXML
     private Button button;  //应用启动按钮
@@ -63,6 +69,22 @@ public class Main extends Application {
 
     @FXML
     private AnchorPane root;  //根布局
+
+    @FXML
+    private GridPane stackPane;  //堆栈布局
+
+    @FXML
+    private Label tipStackText;  //堆栈解释
+
+    @FXML
+    private ImageView imageView;  //展示核心程序图片
+
+    @FXML
+    private Label timeClock;  //展示用去的时间
+
+    private static boolean isOver;  //判断程序是否结束
+
+    private static int stackBodeCount = 0;
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -85,6 +107,11 @@ public class Main extends Application {
     @FXML
     private void initialize() {
         tipText.setText("因为屏幕大小和演示时间的原因，请输入小于等于7的正整数");
+        tipStackText.setText("move(n, from, to)\nn: 圆盘的编号\nfrom: 起始柱子\nto: 目标柱子 \n\n" +
+                "hanoi(n, from, assist, to)\nn:圆盘的编号\nfrom: 起始柱子\nassist: 辅助柱子\nto: 目标柱子");
+
+        Image image = new Image("file:image.png", true);
+        imageView = new ImageView(image);
     }
 
     /**
@@ -92,6 +119,8 @@ public class Main extends Application {
      */
     @FXML
     private void startArith() {
+
+        stackBodeCount = 0;
 
         /*每次开始之前，对屏幕进行清空*/
         root.getChildren().removeAll(rects);
@@ -130,6 +159,37 @@ public class Main extends Application {
             return;
         }
 
+        isOver = false;
+
+
+        //显示时钟
+        new Thread(() -> {
+            int min = 0;  //分
+            int ten_sec = 0;  // 十位的秒
+            int sec = 0;  //个位的秒
+            while (!isOver) {
+                String time = "0" + min + ":" + ten_sec + sec;  //组合时间
+                Platform.runLater(() -> timeClock.setText(time));  //在 applacation 线程更改UI
+                try {
+                    Thread.sleep(990);  //当前线程睡眠1秒
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                //对时间的变换进行判断
+                sec++;
+                if (sec > 9){
+                    ten_sec++;
+                    sec = 0;
+                }
+
+                if (ten_sec > 5){
+                    min++;
+                    ten_sec = 0;
+                }
+            }
+        }).start();
+
         /*将每个柱子上的圆盘数进行初始化*/
         initPositionNum();
 
@@ -141,6 +201,7 @@ public class Main extends Application {
             hanoi(disk_num-1, A, B, C);
             /*恢复按钮*/
             button.setDisable(false);
+            isOver = true;
         }).start();
     }
 
@@ -191,10 +252,11 @@ public class Main extends Application {
      * @param rect 被移动的圆盘
      */
     private void moveDisk(int from, int to, Rectangle rect) {
+
         /*第一步；将圆盘向上移动*/
-        final Timeline timeline=new Timeline();
-        final KeyValue kv_1 = new KeyValue(rect.yProperty(), (baseline - (height*(disk_num+2))));
-        final KeyFrame kf_1 = new KeyFrame(Duration.millis(900), kv_1);
+        final Timeline timeline=new Timeline();  //创建时间轴
+        final KeyValue kv_1 = new KeyValue(rect.yProperty(), (baseline - (height*(disk_num+2))));  //设置操作
+        final KeyFrame kf_1 = new KeyFrame(Duration.millis(900), kv_1);  //设置关键帧
 
         //将关键帧加到时间轴中
         timeline.getKeyFrames().add(kf_1);
@@ -235,6 +297,7 @@ public class Main extends Application {
         /*对每个柱子上面的圆盘数进行修改*/
         position_num[from]--;
         position_num[to]++;
+
     }
 
     public static void main(String[] args) {
@@ -248,18 +311,80 @@ public class Main extends Application {
 
     /**
      * 汉诺塔递归算法
-     * @param n the number of disks
-     * @param A start pillar
-     * @param B assist pillar
-     * @param C target pillar
+     * @param n 圆盘编号
+     * @param A 开始的柱子
+     * @param B 辅助柱子
+     * @param C 目标柱子
      */
     private void hanoi(int n, int A, int B, int C) {
         if (n == 0) {
+
+            addStackNode(n, A, C);
+
             move(n, A, C);
+
+            removeStackNode();
+
         } else {
+            addStackNode(n, A, B, C);
+
             hanoi(n-1, A, C, B);
+
+            removeStackNode();
+
+            addStackNode(n, A, C);
+
             move(n, A, C);
+
+            removeStackNode();
+
+            addStackNode(n, A, B, C);
+
             hanoi(n-1, B, A, C);
+
+            removeStackNode();
         }
+    }
+
+    /**
+     * 在堆栈演示中使用，移除已经出栈的方法节点
+     */
+    private void removeStackNode() {
+        Platform.runLater(() -> {
+            stackNode.get(stackNode.size() - 1).setVisible(false);
+            stackNode.remove(stackNode.size()-1);
+            stackBodeCount --;
+        });
+    }
+
+    /**
+     * 添加要展示的入栈的方法节点
+     * @param n 圆盘编号
+     * @param A 开始的柱子
+     * @param B 辅助柱子
+     * @param C 目标柱子
+     */
+    private void addStackNode(int n, int A, int B, int C) {
+        Platform.runLater(() -> {
+            Button btn = new Button("hanoi(" + n + ", " + A + ", " + C + ", " + B + ")");
+            btn.setMinWidth(180);
+            btn.setMinHeight(40);
+            btn.setFont(new Font(18));
+            stackNode.add(btn);
+            stackPane.add(stackNode.get(stackNode.size() - 1), 0, 9-stackBodeCount);
+            stackBodeCount++;
+        });
+    }
+
+    private void addStackNode(int n, int A, int C) {
+        Platform.runLater(() -> {
+            Button btn = new Button("move(" + n + ", " + A + ", " + C +")");
+            btn.setMinWidth(180);
+            btn.setMinHeight(40);
+            btn.setFont(new Font(18));
+            stackNode.add(btn);
+            stackPane.add(stackNode.get(stackNode.size() - 1), 0, 9-stackBodeCount);
+            stackBodeCount++;
+        });
     }
 }

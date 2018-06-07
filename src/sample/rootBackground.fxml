@@ -3,8 +3,14 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="root" prefHeight="1000.0" prefWidth="1900.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Main">
     <children>
@@ -20,5 +26,56 @@
                 <Label fx:id="warningText" textFill="RED" />
             </children>
         </HBox>
+      <GridPane fx:id="stackPane" layoutX="1200.0" layoutY="500.0" prefHeight="450.0" prefWidth="200.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+      </GridPane>
+      <Label layoutX="387.0" layoutY="962.0" prefHeight="30.0" prefWidth="100.0" text="汉诺塔演示">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label layoutX="1275.0" layoutY="962.0" prefHeight="30.0" prefWidth="100.0" text="堆栈演示">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="tipStackText" layoutX="1480.0" layoutY="300.0" prefHeight="400.0" prefWidth="400.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <ImageView fx:id="imageView" fitHeight="331.0" fitWidth="593.0" layoutX="50.0" layoutY="51.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../image.png" />
+         </image></ImageView>
+      <Label layoutX="297.0" layoutY="14.0" prefHeight="30.0" prefWidth="100.0" text="核心程序">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+      <Label fx:id="timeClock" layoutX="835.0" layoutY="99.0" prefHeight="45.0" prefWidth="127.0" text="00:00">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+      <Label layoutX="828.0" layoutY="77.0" prefHeight="30.0" prefWidth="100.0" text="演示时间">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
     </children>
 </AnchorPane>
