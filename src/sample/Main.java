@@ -5,6 +5,7 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -19,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import javafx.util.Duration;
 
 import java.io.IOException;
@@ -32,9 +34,9 @@ public class Main extends Application {
     /*这个数由用户输入*/
     private int disk_num;  //圆盘的个数
 
-    private int divide_width = 300;    //每个柱子要占用的面积的大小，用来计算圆盘的移动
+    private int divide_width = 220;    //每个柱子要占用的面积的大小，用来计算圆盘的移动
 
-    private int baseline = 960; //放置圆盘的底线
+    private int baseline = 760; //放置圆盘的底线
 
     private int height = 20;   //圆盘的高度
 
@@ -43,9 +45,9 @@ public class Main extends Application {
 
     private int[] x_num = {100, 85, 70, 55, 40, 25, 10};  //绘画圆盘的x坐标
 
-    private int[] y_num = {820, 840, 860, 880, 900, 920, 940};  //绘画圆盘的y坐标
+    private int[] y_num = {620, 640, 660, 680, 700, 720, 740};  //绘画圆盘的y坐标
 
-    private int[] width_num = {100, 130, 160, 190, 220, 250, 280};   //每个圆盘的宽度
+    private int[] width_num = {30, 60, 90, 120, 150, 180, 210};   //每个圆盘的宽度
 
     int A = 0;  //第一个柱子，以数字0表示为了方便计算
     int B = 1;  //第二个柱子，以数字0表示为了方便计算
@@ -95,8 +97,10 @@ public class Main extends Application {
 
         primaryStage.setTitle("汉诺塔算法演示");
 
-        Scene scene = new Scene(root, 1900, 1000);
+        Scene scene = new Scene(root, 1200, 800);
 
+        primaryStage.setOnCloseRequest(event -> System.exit(0));
+        primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
     }
@@ -128,6 +132,8 @@ public class Main extends Application {
 
         /*错误行为的提示言语*/
         String errorMessage = "";
+        warningText.setText(errorMessage);
+        tipText.setText("因为屏幕大小和演示时间的原因，请输入小于等于7的正整数");
 
         initColors();
 
@@ -135,6 +141,7 @@ public class Main extends Application {
         if (input.getText() == null || input.getText().length() == 0) {
             errorMessage += "输入无效！\n";
             warningText.setText(errorMessage);
+            tipText.setText("");
             input.setText("");
             return;
         } else {
@@ -144,6 +151,7 @@ public class Main extends Application {
             } catch (NumberFormatException e) {
                 errorMessage += "输入的数值无效，必须是正整数!\n";
                 warningText.setText(errorMessage);
+                tipText.setText("");
                 input.setText("");
                 return;
             }
@@ -155,6 +163,7 @@ public class Main extends Application {
         if (disk_num > 7) {
             errorMessage += "输入的数值无效，请输入小于等于7的正整数!\n";
             warningText.setText(errorMessage);
+            tipText.setText("");
             input.setText("");
             return;
         }
